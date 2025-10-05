@@ -116,6 +116,7 @@ export default function UserProfileCard({ data }) {
     <Card
       sx={{
         padding: 1,
+        paddingBottom: 0,
         textAlign: "center",
         alignItems: "center",
         mx: "auto",
