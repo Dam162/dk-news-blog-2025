@@ -121,6 +121,7 @@ export default function UserProfileCard({ data }) {
         alignItems: "center",
         mx: "auto",
         overflow: "hidden",
+        zIndex:"1 !important",
       }}
     >
       {/* 🔹 Cover Image */}

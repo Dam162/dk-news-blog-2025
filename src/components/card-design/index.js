@@ -39,6 +39,13 @@ import LinkIcon from "@mui/icons-material/Link";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import {
+  Facebook as FacebookIcon,
+  WhatsApp as WhatsappIcon,
+  Twitter as TwitterIcon,
+  LinkedIn as LinkedinIcon,
+  Telegram as TelegramIcon,
+} from "@mui/icons-material";
 
 export default function CardDesignHome({ data, loading }) {
   const blogData = data;
@@ -74,6 +81,83 @@ export default function CardDesignHome({ data, loading }) {
   // comment box state
   const [comment, setComment] = useState("");
   const [loadingComment, setLoadingComment] = useState(false);
+
+  const [anchorE2, setAnchorE2] = useState(null);
+  const open2 = Boolean(anchorE2);
+
+  // const shareUrl = `https://dk-news-blog-2025.vercel.app/blog-details/${blogData?.blogID}`;
+  const handleOpenSocial = (event) => {
+    setAnchorE2(event.currentTarget);
+  };
+
+  const handleCloseSocial = () => {
+    setAnchorE2(null);
+  };
+
+  // shareHandler
+  const handleShare = async (platform) => {
+    const shareUrl = `https://dk-news-blog-2025.vercel.app/blog-details/${blogData?.blogID}`;
+    let url = "";
+
+    switch (platform) {
+      case "facebook":
+        url = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+        break;
+      case "twitter":
+        url = `https://twitter.com/intent/tweet?url=${shareUrl}`;
+        break;
+      case "linkedin":
+        url = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+        break;
+      case "whatsapp":
+        url = `https://api.whatsapp.com/send?text=${shareUrl}`;
+        break;
+      case "telegram":
+        url = `https://t.me/share/url?url=${shareUrl}`;
+        break;
+      default:
+        return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+
+    // 🔹 Optional: Update share count in Firestore
+    const blogRef = doc(db, "createPost-dk-news-blog", data?.blogID);
+    await updateDoc(blogRef, {
+      share: (data?.share || 0) + 1,
+    });
+
+    handleCloseSocial();
+  };
+
+  // const handleShare = (platform) => {
+  //   let url = "";
+
+  //   switch (platform) {
+  //     case "facebook":
+  //       url = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+  //       break;
+  //     case "twitter":
+  //       url = `https://twitter.com/intent/tweet?url=${shareUrl}`;
+  //       break;
+  //     case "linkedin":
+  //       url = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+  //       break;
+  //     case "whatsapp":
+  //       url = `https://api.whatsapp.com/send?text=${shareUrl}`;
+  //       break;
+  //     case "telegram":
+  //       url = `https://t.me/share/url?url=${shareUrl}`;
+  //       break;
+  //     default:
+  //       break;
+  //   }
+
+  //   window.open(url, "_blank");
+  //   handleCloseSocial();
+  // };
+  //  const [anchorEl, setAnchorEl] = useState(null);
+  // const open = Boolean(anchorEl);
   // useEffect(() => {
   //   onAuthStateChanged(auth, async (user) => {
   //     if (user) {
@@ -403,6 +487,7 @@ export default function CardDesignHome({ data, loading }) {
                 vertical: "top",
                 horizontal: "right",
               }}
+              sx={{ zIndex: 1 }}
             >
               {/* Post Management */}
               {/* <MenuItem>👤 User Profile</MenuItem>
@@ -467,9 +552,9 @@ export default function CardDesignHome({ data, loading }) {
             // width: "200px",
             // maxWidth: "90%",
             // overflow: "hidden",
-            // zIndex: 1300,
           },
         }}
+        sx={{ zIndex: 20 }} 
       >
         <UserProfileCard data={data} className="user-profile-card" />
       </Popover>
@@ -544,9 +629,51 @@ export default function CardDesignHome({ data, loading }) {
                 <ModeCommentOutlined />
               </IconButton>
 
-              <IconButton variant="plain" color="neutral" size="sm">
+              <IconButton
+                variant="plain"
+                color="neutral"
+                size="sm"
+                onClick={handleOpenSocial}
+              >
                 <SendOutlined />
               </IconButton>
+
+              <Menu
+                anchorEl={anchorE2}
+                open={Boolean(anchorE2)}
+                onClose={handleCloseSocial}
+                placement="bottom-end"
+                disableScrollLock
+                sx={{
+                  p: 0.5,
+                  borderRadius: "12px",
+                  // boxShadow: "0px 4px 15px rgba(0,0,0,0.15)",
+                  width: { xs: "90%", sm: "250px" },
+                  maxWidth: "100%",
+                  zIndex: 1,
+                }}
+              >
+                <MenuItem onClick={() => handleShare("facebook")}>
+                  <FacebookIcon sx={{ mr: 1, color: "#1877F2" }} />
+                  Facebook
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("whatsapp")}>
+                  <WhatsappIcon sx={{ mr: 1, color: "#25D366" }} />
+                  WhatsApp
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("twitter")}>
+                  <TwitterIcon sx={{ mr: 1, color: "#1DA1F2" }} />
+                  Twitter
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("linkedin")}>
+                  <LinkedinIcon sx={{ mr: 1, color: "#0A66C2" }} />
+                  LinkedIn
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("telegram")}>
+                  <TelegramIcon sx={{ mr: 1, color: "#0088cc" }} />
+                  Telegram
+                </MenuItem>
+              </Menu>
             </>
           )}
         </Box>
