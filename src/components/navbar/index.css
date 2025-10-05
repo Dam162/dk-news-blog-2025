@@ -1,0 +1,280 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+/* ---------------- NAVBAR ---------------- */
+.NavbarItems {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  align-items: center;
+  font-size: 1.2rem;
+  border-radius: 9px;
+  padding: 6px 20px;
+  height: 50px;
+  width: 90%;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%); /* ✅ Fixed translate */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+  z-index: 99 !important;
+}
+
+.NavbarItems.scrolled {
+  /* background-color: rgb(40, 43, 44); */
+  background-color: rgb(34, 193, 195);
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+/* ---------------- LOGO ---------------- */
+.logo {
+  color: green;
+  cursor: pointer;
+  justify-self: start;
+  font-size: medium;
+}
+
+.NavbarItems.scrolled .logo {
+  color: white;
+}
+
+/* ---------------- MENU ITEMS ---------------- */
+.MenuItems {
+  list-style: none;
+  display: flex;
+  align-items: center !important;
+  white-space: nowrap;
+}
+
+/* ---------------- NAV LINKS ---------------- */
+.nav-links {
+  display: flex; /* flex bana do */
+  align-items: center; /* vertically center */
+  justify-content: center; /* horizontally center */
+  text-decoration: none;
+  background-color: white;
+  color: green;
+  padding: 8px 10px;
+  margin: 0px 5px;
+  border-radius: 5px;
+  font-size: small;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid rgb(255, 255, 255) !important;
+}
+
+.nav-links i {
+  padding-right: 6px;
+}
+
+.nav-links:hover {
+  background: rgb(34, 193, 195);
+  color: rgb(255, 255, 255);
+  border-radius: 5px;
+  border: 1px solid rgb(34, 193, 195) !important;
+}
+
+.nav-links.active {
+  background-color: rgba(253, 187, 45, 1);
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+  border: 1px solid rgba(253, 187, 45, 1) !important;
+}
+
+/* 🔹 Scrolled state */
+.NavbarItems.scrolled .nav-links {
+  background-color: transparent;
+  color: white;
+  border: 1px solid transparent !important;
+}
+
+.NavbarItems.scrolled .nav-links:hover {
+  border: 1px solid white !important;
+  color: white;
+}
+
+.NavbarItems.scrolled .nav-links.active {
+  background-color: white;
+  border: 1px solid white;
+  color: black;
+}
+
+.NavbarItems.scrolled .nav-button {
+}
+
+/* ---------------- NAV BUTTON ---------------- */
+.nav-button {
+  padding: 10px;
+  background-color: green;
+  border-radius: 5px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: none;
+}
+
+#nav-button {
+  padding: 8px 15px;
+  cursor: pointer;
+  border: 2px solid green;
+}
+
+#nav-button:hover {
+  background-color: white;
+  color: green;
+}
+
+/* 🔹 Scrolled state */
+.NavbarItems.scrolled .nav-button {
+  background-color: white;
+  color: black;
+  border: 2px solid rgb(255, 255, 255) !important;
+}
+
+.NavbarItems.scrolled .nav-button:hover {
+  background-color: rgb(34, 193, 195) !important;
+  color: rgb(255, 255, 255) !important;
+  border: 2px solid rgb(255, 255, 255) !important;
+}
+
+.NavbarItems.scrolled .search-icon {
+  color: rgb(34, 193, 195);
+}
+
+/* ---------------- HAMBURGER ---------------- */
+.fa-bars,
+.fa-times {
+  color: green;
+  cursor: pointer;
+}
+
+.Hamburger-Cross-Icons {
+  display: none;
+}
+
+/* ---------------- SEARCH ---------------- */
+.search-container {
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+  position: relative;
+  flex: 1;
+  max-width: 100%;
+  transition: max-width 0.3s ease;
+}
+
+.search-container.wide {
+  max-width: 900px;
+}
+
+.search-input {
+  width: 100%;
+  background-color: white;
+  padding: 8px 35px 8px 12px;
+  border-radius: 20px;
+  border: 1px solid green;
+  outline: none;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  border-color: green;
+  box-shadow: 0 0 6px rgba(9, 88, 9, 0.3);
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  color: green;
+  cursor: pointer;
+  font-size: 14px;
+}
+.search-cancel-icon {
+  position: absolute;
+  right: 12px;
+  color: red;
+  font-size: 14px;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media screen and (max-width: 992px) {
+  .search-container {
+    max-width: 700px !important;
+  }
+
+  .NavbarItems.scrolled .MenuItems {
+    background-color: rgb(34, 193, 195);
+  }
+
+  .NavbarItems.scrolled .fa-bars,
+  .NavbarItems.scrolled .fa-times {
+    color: white;
+  }
+
+  .MenuItems {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: rgb(255, 255, 255);
+    width: 100%;
+    border-radius: 9px;
+    height: auto;
+    backdrop-filter: blur(5px);
+    position: absolute;
+    align-items: stretch;
+    top: 0;
+    left: -110%;
+    padding: 50px 0 40px 0;
+    margin: 0;
+    z-index: -1;
+    transition: all 0.3s ease-in-out;
+  }
+  .menu-list {
+    width: 90%;
+  }
+  .menu-button {
+    width: 100%;
+  }
+
+  .MenuItems.active {
+    left: 0%;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center !important;
+    gap: 5px;
+    /* background-color: aquamarine; */
+    width: 100% !important;
+    padding: 1.5rem 0;
+    margin: 0px;
+  }
+
+  .Hamburger-Cross-Icons {
+    display: block;
+  }
+
+  .nav-button {
+    padding: 1rem;
+    display: block;
+    text-align: center;
+    padding: 20px 0px !important;
+    width: 90%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    font-size: large;
+  }
+}
+
+@media (max-width: 350px) {
+  .search-container,
+  .search-container.wide {
+    display: none;
+  }
+}

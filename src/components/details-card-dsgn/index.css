@@ -1,0 +1,81 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.card-container {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.card-avatar {
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 43px;
+  height: 43px;
+}
+.card-avatar img,
+.card-avatar .MuiAvatar-root {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  background: white;
+}
+.card-avatar-profile {
+  padding: 2px;
+  border: 2px solid rgba(253, 187, 45, 1);
+  margin: 0px;
+}
+
+.card-link-title-detail {
+  /* display: -webkit-box !important; */
+  /* -webkit-line-clamp: 2 !important; */
+  /* -webkit-box-orient: vertical !important; */
+  /* overflow: hidden !important; */
+  /* text-overflow: ellipsis !important; */
+  /* white-space: normal !important; */
+  font-weight: bold !important;
+  margin: 10px 0px !important;
+}
+
+.card-link-detail-2 {
+  /* display: -webkit-box !important;
+  -webkit-line-clamp: 5 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: normal !important; */
+}
+.post-link {
+  background-color: rgba(34, 193, 195, 1) !important;
+  padding: 2px 8px !important;
+  color: white !important;
+}
+.post-link:hover {
+  padding: 2px 8px !important;
+  background-color: rgba(253, 187, 45, 1) !important;
+  text-decoration: none !important;
+  color: white !important;
+  translate: 0px -1px;
+}
+.LCS-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: space-between;
+  /* background-color: royalblue !important; */
+}
+.LCS-count {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px !important;
+  font-weight: bold !important;
+  font-size: 12px;
+  /* background-color: gainsboro; */
+  border: 1px solid gainsboro;
+  width: 24%;
+  border-radius: 4px;
+  padding: 3px 0px;
+}

@@ -1,0 +1,123 @@
+/* Reset styles and set global defaults */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* height: 100%; */
+  font-family: Arial, sans-serif;
+  /* background-color: #f3f4f6; */
+}
+
+.signUp-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+.signUp-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.signUp-card {
+  background-color: #ffffff49 !important;
+  border-radius: 8px;
+  padding: 30px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid white;
+}
+
+.signUp-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.signUp-input {
+  margin-top: 15px;
+}
+
+.signUp-button {
+  margin-top: 20px;
+  background: rgb(34, 193, 195);
+  background: linear-gradient(
+    70deg,
+    rgba(34, 193, 195, 1) 0%,
+    rgba(253, 187, 45, 1) 100%
+  );
+  color: rgb(255, 255, 255) !important;
+  font-weight: bold;
+  text-transform: none !important;
+  /* cursor: pointer; */
+  transition: all 0.3s;
+  position: relative;
+  transition: all 0.3s;
+}
+.signUp-button::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  transition: all 0.3s;
+  transform: scale(0.1, 1);
+}
+
+.signUp-button:hover::before {
+  opacity: 1;
+  transform: scale(1, 1);
+}
+.signUp-button:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: all 0.3s;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.signUp-button:hover::after {
+  opacity: 0;
+  transform: scale(0.1, 2);
+  color: white !important;
+}
+
+.no-Account {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.no-Account a {
+  color: #1976d2;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.no-Account a:hover {
+  text-decoration: none;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .signUp-card {
+    padding: 20px 15px;
+  }
+
+  .signUp-title {
+    font-size: 20px;
+  }
+}

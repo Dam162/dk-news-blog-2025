@@ -1,0 +1,79 @@
+/* Footer Section */
+.footer {
+  color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  /* background-color: #333333; */
+}
+
+/* Bottom section */
+.footer-bottom {
+  font-size: 13px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
+.container-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0px;
+  width: 100%;
+}
+
+.social-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Social Buttons */
+.social-icons .btn {
+  /* background-color: #333333; */
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+/* Hover effect */
+.social-icons .btn:hover {
+  opacity: 0.9;
+  transform: scale(1.1);
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+/* Individual social colors */
+.facebook {
+  background-color: #3b5998;
+}
+.twitter {
+  background-color: #55acee;
+}
+.google {
+  background-color: #dd4b39;
+}
+.instagram {
+  background-color: #ac2bac;
+}
+.linkedin {
+  background-color: #0082ca;
+}
+.github {
+  background-color: #333333;
+}
+
+/* Responsive: 3 icons per row under 700px */
+@media screen and (max-width: 700px) {
+  .social-icons {
+    justify-content: center;
+  }
+}
