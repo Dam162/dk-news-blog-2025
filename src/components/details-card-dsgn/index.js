@@ -19,7 +19,7 @@ import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded
 import BookmarkRoundedIcon from "@mui/icons-material/BookmarkRounded"; // filled version
 import "./index.css";
 import CardMedia from "@mui/material/CardMedia";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import moment from "moment";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
@@ -36,20 +36,36 @@ import MenuItem from "@mui/material/MenuItem";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import {
+  Facebook as FacebookIcon,
+  WhatsApp as WhatsappIcon,
+  Twitter as TwitterIcon,
+  LinkedIn as LinkedinIcon,
+  Telegram as TelegramIcon,
+} from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LinkIcon from "@mui/icons-material/Link";
+import EditPostModal from "../edit-open-model";
+import CommentThread from "../comment-thread";
 
 export default function CardDesignDetails({
   data,
   detailsPath,
   loading,
+  edit,
 }) {
-//   console.log("blogDetailsData", data);
+  //   console.log("blogDetailsData", data);
+  const blogsData = data;
   const auth = getAuth();
   const db = getFirestore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [modelOpen, setModelOpen] = useState(false);
   const [currentUserUid, setCurrentUserUid] = useState(null);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [alreadyLogin, setAlreadyLogin] = useState(false);
+  const [openEditPostModel, setOpenEditPostModel] = useState(false);
   // const [isLiked, setIsLiked] = useState(false);
   const isLiked = data?.like?.includes(currentUserUid);
   // const isFavorite = currentUserData?.favorites?.includes(blogData?.blogID);
@@ -67,14 +83,69 @@ export default function CardDesignDetails({
   // console.log("blogData in card", blogData);
   // console.log("currentUserData in card", currentUserData);
 
+  // ✅ Check if we are on Dashboard page
+  const isDashboard = location.pathname.includes("/dashboard");
+  console.log("isDashboard:", isDashboard);
+
+  // ✅ Check if logged-in user is author
+  const isAuthor = currentUserUid === data?.userID;
+  console.log("isAuthor:", isAuthor);
+
   // 🔹 state for profile popover
   const [profileAnchor, setProfileAnchor] = useState(null);
-  const [showCommentBox, setShowCommentBox] = useState(false);
+  const [showCommentBox, setShowCommentBox] = useState(true);
   const profileOpen = Boolean(profileAnchor);
 
   // comment box state
   const [comment, setComment] = useState("");
   const [loadingComment, setLoadingComment] = useState(false);
+
+  const [anchorE2, setAnchorE2] = useState(null);
+  const open2 = Boolean(anchorE2);
+
+  const handleOpenSocial = (event) => {
+    setAnchorE2(event.currentTarget);
+  };
+
+  const handleCloseSocial = () => {
+    setAnchorE2(null);
+  };
+
+  // shareHandler
+  const handleShare = async (platform) => {
+    const shareUrl = `https://dk-news-blog-2025.vercel.app/blog-details/${data?.blogID}`;
+    let url = "";
+
+    switch (platform) {
+      case "facebook":
+        url = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+        break;
+      case "twitter":
+        url = `https://twitter.com/intent/tweet?url=${shareUrl}`;
+        break;
+      case "linkedin":
+        url = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
+        break;
+      case "whatsapp":
+        url = `https://api.whatsapp.com/send?text=${shareUrl}`;
+        break;
+      case "telegram":
+        url = `https://t.me/share/url?url=${shareUrl}`;
+        break;
+      default:
+        return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+
+    // 🔹 Optional: Update share count in Firestore
+    const blogRef = doc(db, "createPost-dk-news-blog", data?.blogID);
+    await updateDoc(blogRef, {
+      share: (data?.share || 0) + 1,
+    });
+
+    handleCloseSocial();
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -91,9 +162,7 @@ export default function CardDesignDetails({
 
           // 🔹 Set isFavorite based on current user's favorites
           if (data?.blogID) {
-            setIsFavorite(
-              userDataWithID.favorites?.includes(data.blogID)
-            );
+            setIsFavorite(userDataWithID.favorites?.includes(data.blogID));
           }
         } else {
           setCurrentUserData(null);
@@ -137,11 +206,7 @@ export default function CardDesignDetails({
         like.push(currentUserUid);
       }
       // update data
-      const blogRef = doc(
-        db,
-        "createPost-dk-news-blog",
-        data?.blogID
-      );
+      const blogRef = doc(db, "createPost-dk-news-blog", data?.blogID);
       await updateDoc(blogRef, { like: like });
     } else {
       setModelOpen(true);
@@ -155,14 +220,6 @@ export default function CardDesignDetails({
   const handleProfileClose = () => {
     setProfileAnchor(null);
   };
-
-  // console.log("isFavourites", isFavourite);
-  // useEffect(() => {
-  //   const favs = JSON.parse(localStorage.getItem("favourites")) || [];
-  //   if (data?.id && favs.includes(data.id)) {
-  //     // setIsFavourite(true);
-  //   }
-  // }, [data?.id]);
 
   const handleFavoriteClick = async () => {
     // alert("Feature coming soon!");
@@ -199,22 +256,18 @@ export default function CardDesignDetails({
     // alert("Feature coming soon!");
     if (alreadyLogin) {
       setLoadingComment(true);
-      let userComment = Array.isArray(data?.comment)
-        ? [...data.comment]
-        : [];
+      let userComment = Array.isArray(data?.comment) ? [...data.comment] : [];
       const newComment = {
         userID: currentUserUid,
         comment: comment,
         commentedAt: new Date().toISOString(),
         replyComments: [],
+        likes: [],
+        dislikes: [],
       };
       userComment.push(newComment);
       // update data
-      const blogRef = doc(
-        db,
-        "createPost-dk-news-blog",
-        data?.blogID
-      );
+      const blogRef = doc(db, "createPost-dk-news-blog", data?.blogID);
       await updateDoc(blogRef, { comment: userComment })
         .then(() => {
           toast.success("Comment Added Successfully", {
@@ -246,66 +299,25 @@ export default function CardDesignDetails({
     setAnchorEl(null);
   };
 
-  // Menu action handlers
-  const handleEdit = () => {
-    console.log("Edit Post");
-    handleMenuClose();
-  };
-
   const handleDelete = () => {
     console.log("Delete Post");
     handleMenuClose();
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(
-      window.location.href + "/post/" + data?.id
-    );
-    handleMenuClose();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    try {
+      const link = `${window.location.origin}/blog-details/${data?.blogID}`;
+      await navigator.clipboard.writeText(link);
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 5000);
+      handleMenuClose();
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+    }
   };
-
-  // const handleShare = () => {
-  //   if (navigator.share) {
-  //     navigator.share({
-  //       title: data?.blogTitle,
-  //       text: data?.blogDetails,
-  //       url: window.location.href + "/post/" + data?.id,
-  //     });
-  //   } else {
-  //     console.log("Share API not supported");
-  //   }
-  //   handleMenuClose();
-  // };
-
-  // const handleReport = () => {
-  //   console.log("Report Post");
-  //   handleMenuClose();
-  // };
-
-  // const handleFollow = () => {
-  //   console.log("Follow / Unfollow Author");
-  //   handleMenuClose();
-  // };
-
-  // const handleSave = () => {
-  //   console.log("Save Post");
-  //   handleMenuClose();
-  // };
-
-  // const handlePin = () => {
-  //   console.log("Pin / Unpin Post");
-  //   handleMenuClose();
-  // };
-
-  // const handleInsights = () => {
-  //   console.log("View Insights");
-  //   handleMenuClose();
-  // };
-
-  // const handleMute = () => {
-  //   console.log("Mute Notifications");
-  //   handleMenuClose();
-  // };
 
   return (
     <Card
@@ -387,30 +399,35 @@ export default function CardDesignDetails({
                 horizontal: "right",
               }}
             >
-              {/* Post Management */}
-              {/* <MenuItem>👤 User Profile</MenuItem>
-              <MenuItem onClick={handleFollow}>
-                👤 Follow / Unfollow Author
-              </MenuItem> */}
-              <MenuItem onClick={handleEdit}>✏️ Edit Post</MenuItem>
-              <MenuItem onClick={handleDelete}>🗑️ Delete Post</MenuItem>
-              {/* <MenuItem onClick={handlePin}>📌 Pin / Unpin Post</MenuItem> */}
-              {/* <Divider /> */}
+              {isAuthor && (isDashboard || location?.state?.edit) ? (
+                <>
+                  <MenuItem onClick={() => setOpenEditPostModel(true)}>
+                    <EditIcon fontSize="small" sx={{ mr: 1 }} />
+                    Edit Post
+                  </MenuItem>
 
-              {/* User Engagement */}
-              <MenuItem onClick={handleCopyLink}>🔗 Copy Link</MenuItem>
-              {/* <MenuItem onClick={handleShare}>📤 Share Post</MenuItem> */}
-              {/* <MenuItem onClick={handleSave}>📑 Save Post</MenuItem> */}
-              {/* <Divider /> */}
+                  <MenuItem onClick={handleDelete}>
+                    <DeleteIcon
+                      fontSize="small"
+                      sx={{ mr: 1, color: "error.main" }}
+                    />
+                    Delete Post
+                  </MenuItem>
+                </>
+              ) : null}
 
-              {/* Content Actions */}
-              {/* <MenuItem onClick={handleReport}>🚩 Report Post</MenuItem> */}
-              {/* <MenuItem onClick={handleMute}>🔕 Mute Notifications</MenuItem> */}
+              {openEditPostModel && (
+                <EditPostModal
+                  open={openEditPostModel}
+                  handleClose={() => setOpenEditPostModel(false)}
+                  data={data}
+                />
+              )}
 
-              {/* <Divider /> */}
-
-              {/* Advanced */}
-              {/* <MenuItem onClick={handleInsights}>📊 View Insights</MenuItem> */}
+              <MenuItem onClick={handleCopyLink}>
+                <LinkIcon fontSize="small" sx={{ mr: 1 }} />
+                {copied ? "Copied!" : "Copy Link"}
+              </MenuItem>
             </Menu>
           </>
         )}
@@ -429,10 +446,6 @@ export default function CardDesignDetails({
           sx: {
             boxShadow: 3,
             borderRadius: 2,
-            // width: "200px",
-            // maxWidth: "90%",
-            // overflow: "hidden",
-            // zIndex: 1300,
           },
         }}
       >
@@ -495,7 +508,12 @@ export default function CardDesignDetails({
                 onClick={likeHandler}
               >
                 {isLiked ? (
-                  <FavoriteIcon style={{ color: "green" }} />
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 2 }}
+                  >
+                    <FavoriteIcon style={{ color: "green" }} />
+                    <b>{formatCount(data?.like?.length || 0, "")}</b>
+                  </div>
                 ) : (
                   <FavoriteBorder />
                 )}
@@ -504,14 +522,61 @@ export default function CardDesignDetails({
                 variant="plain"
                 color="neutral"
                 size="sm"
-                onClick={() => setShowCommentBox((prev) => !prev)} // toggle
+                onClick={() => setShowCommentBox((prev) => !prev)}
               >
-                <ModeCommentOutlined />
+                <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <ModeCommentOutlined />
+                  <b>{formatCount(data?.comment?.length || 0, "")}</b>
+                </div>
               </IconButton>
 
-              <IconButton variant="plain" color="neutral" size="sm">
-                <SendOutlined />
+              <IconButton
+                variant="plain"
+                color="neutral"
+                size="sm"
+                onClick={handleOpenSocial}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <SendOutlined />
+                  <b>{formatCount(data?.share?.length || 0, "")}</b>
+                </div>
               </IconButton>
+              <Menu
+                anchorEl={anchorE2}
+                open={Boolean(anchorE2)}
+                onClose={handleCloseSocial}
+                placement="bottom-end"
+                disableScrollLock
+                sx={{
+                  p: 0.5,
+                  borderRadius: "12px",
+                  // boxShadow: "0px 4px 15px rgba(0,0,0,0.15)",
+                  width: { xs: "90%", sm: "250px" },
+                  maxWidth: "100%",
+                  zIndex: 1,
+                }}
+              >
+                <MenuItem onClick={() => handleShare("facebook")}>
+                  <FacebookIcon sx={{ mr: 1, color: "#1877F2" }} />
+                  Facebook
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("whatsapp")}>
+                  <WhatsappIcon sx={{ mr: 1, color: "#25D366" }} />
+                  WhatsApp
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("twitter")}>
+                  <TwitterIcon sx={{ mr: 1, color: "#1DA1F2" }} />
+                  Twitter
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("linkedin")}>
+                  <LinkedinIcon sx={{ mr: 1, color: "#0A66C2" }} />
+                  LinkedIn
+                </MenuItem>
+                <MenuItem onClick={() => handleShare("telegram")}>
+                  <TelegramIcon sx={{ mr: 1, color: "#0088cc" }} />
+                  Telegram
+                </MenuItem>
+              </Menu>
             </>
           )}
         </Box>
@@ -554,94 +619,14 @@ export default function CardDesignDetails({
         )}
       </CardContent>
 
-      {/* Content */}
-      <CardContent>
-        {loading ? (
-          <>
-            <Skeleton variant="text" width="30%" />
-            <Skeleton variant="text" width="90%" />
-            <Skeleton variant="text" width="80%" />
-            <Skeleton variant="text" width="95%" />
-          </>
-        ) : (
-          <>
-            <Link
-              component="span"
-              underline="none"
-              textColor="text.primary"
-              sx={{ fontSize: "sm", fontWeight: "lg", cursor: "default" }}
-              className="LCS-link"
-            >
-              {/* <div className="LCS-count">
-                {formatCount(data?.like?.length || 0, "❤️")}
-              </div>
-
-              <div className="LCS-count">
-                {formatCount(data?.comment?.length || 0, "💬")}
-              </div>
-
-              <div className="LCS-count">
-                {formatCount(data?.share?.length || 0, "📤")}
-              </div> */}
-              <div className="LCS-count">
-                <FavoriteBorderIcon
-                  sx={{
-                    fontSize: 16,
-                    verticalAlign: "middle",
-                    color: "#e91e63",
-                  }}
-                />
-                {formatCount(data?.like?.length || 0, "")}
-              </div>
-
-              <div className="LCS-count">
-                <ChatBubbleOutlineIcon
-                  sx={{
-                    fontSize: 16,
-                    verticalAlign: "middle",
-                    color: "#2196f3",
-                  }}
-                />
-                {formatCount(data?.comment?.length || 0, "")}
-              </div>
-
-              <div className="LCS-count">
-                <ShareOutlinedIcon
-                  sx={{
-                    fontSize: 16,
-                    verticalAlign: "middle",
-                    color: "#4caf50",
-                  }}
-                />
-                {formatCount(data?.share?.length || 0, "")}
-              </div>
-            </Link>
-
-            <Typography
-              sx={{ fontSize: "sm", textAlign: "justify" }}
-              className="card-link-title-detail"
-            >
-              {data?.blogTitle ||
-                "The React component library you always wanted The React component library you always wanted"}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "sm",
-                color: "text.tertiary",
-                textAlign: "justify",
-              }}
-              className="card-link-detail-2"
-            >
-              {data?.blogDetails ||
-                "MUI is a simple and powerful component library for React. Build your own design system, or start with Material Design."}
-            </Typography>
-          </>
-        )}
-      </CardContent>
-
       {/* Comment Box */}
       {showCommentBox && (
-        <CardContent orientation="horizontal" sx={{ gap: 1 }}>
+        <CardContent
+          orientation="horizontal"
+          sx={{
+            gap: 1,
+          }}
+        >
           {loading ? (
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
@@ -748,13 +733,31 @@ export default function CardDesignDetails({
                 {loadingComment ? (
                   <CircularProgress style={{ color: "white" }} size={20} />
                 ) : (
-                  "Post"
+                  "Comment"
                 )}
               </Link>
             </>
           )}
         </CardContent>
       )}
+      {/* Show all comments below */}
+      {Array.isArray(data?.comment) && data.comment.length > 0 && (
+        <CardContent
+          sx={{
+            // border: "1px solid lightgray",
+            // paddingX: 2,
+            borderRadius: 10,
+          }}
+        >
+          <CommentThread
+            currentUserData={currentUserData}
+            alreadyLogin={alreadyLogin}
+            data={blogsData}
+            postId={blogsData?.blogID}
+          />
+        </CardContent>
+      )}
+
       <BasicModal open={modelOpen} handleClose={() => setModelOpen(false)} />
     </Card>
   );

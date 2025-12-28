@@ -19,7 +19,7 @@ import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded
 import BookmarkRoundedIcon from "@mui/icons-material/BookmarkRounded"; // filled version
 import "./index.css";
 import CardMedia from "@mui/material/CardMedia";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import moment from "moment";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
@@ -31,7 +31,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { toast } from "react-toastify";
 // MUI Menu Components
 import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { MenuItem, Snackbar } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LinkIcon from "@mui/icons-material/Link";
@@ -46,13 +46,17 @@ import {
   LinkedIn as LinkedinIcon,
   Telegram as TelegramIcon,
 } from "@mui/icons-material";
+import EditPostModal from "../edit-open-model";
 
-export default function CardDesignHome({ data, loading }) {
+export default function CardDesignHome({ data, loading, edit }) {
+  const location = useLocation();
+  console.log("location in card:", location);
   const blogData = data;
   const auth = getAuth();
   const db = getFirestore();
   const navigate = useNavigate();
   const [modelOpen, setModelOpen] = useState(false);
+  const [openEditPostModel, setOpenEditPostModel] = useState(false);
   const [currentUserUid, setCurrentUserUid] = useState(null);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [alreadyLogin, setAlreadyLogin] = useState(false);
@@ -84,7 +88,15 @@ export default function CardDesignHome({ data, loading }) {
 
   const [anchorE2, setAnchorE2] = useState(null);
   const open2 = Boolean(anchorE2);
+  const [copied, setCopied] = useState(false);
 
+  // ✅ Check if we are on Dashboard page
+  const isDashboard = location.pathname.includes("/dashboard");
+  console.log("isDashboard:", isDashboard);
+
+  // ✅ Check if logged-in user is author
+  const isAuthor = currentUserUid === blogData?.userID;
+  console.log("isAuthor:", isAuthor);
   // const shareUrl = `https://dk-news-blog-2025.vercel.app/blog-details/${blogData?.blogID}`;
   const handleOpenSocial = (event) => {
     setAnchorE2(event.currentTarget);
@@ -350,9 +362,17 @@ export default function CardDesignHome({ data, loading }) {
     handleMenuClose();
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href + "/post/" + data?.id);
-    handleMenuClose();
+  const handleCopyLink = async () => {
+    try {
+      const link = `${window.location.origin}/blog-details/${data?.blogID}`;
+      await navigator.clipboard.writeText(link);
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 5000);
+      handleMenuClose();
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+    }
   };
 
   // const handleShare = () => {
@@ -498,23 +518,38 @@ export default function CardDesignHome({ data, loading }) {
               <MenuItem onClick={handleDelete}>🗑️ Delete Post</MenuItem>
               <MenuItem onClick={handleCopyLink}>🔗 Copy Link</MenuItem> */}
 
-              <MenuItem onClick={handleEdit}>
-                <EditIcon fontSize="small" sx={{ mr: 1 }} />
-                Edit Post
-              </MenuItem>
+              {/* ✅ Show Edit/Delete only on dashboard and if current user is author */}
+              {/* ✅ Show Edit/Delete only if user is author AND route is dashboard */}
+              {isAuthor && isDashboard ? (
+                <>
+                  <MenuItem onClick={() => setOpenEditPostModel(true)}>
+                    <EditIcon fontSize="small" sx={{ mr: 1 }} />
+                    Edit Post
+                  </MenuItem>
 
-              <MenuItem onClick={handleDelete}>
-                <DeleteIcon
-                  fontSize="small"
-                  sx={{ mr: 1, color: "error.main" }}
+                  <MenuItem onClick={handleDelete}>
+                    <DeleteIcon
+                      fontSize="small"
+                      sx={{ mr: 1, color: "error.main" }}
+                    />
+                    Delete Post
+                  </MenuItem>
+                </>
+              ) : null}
+              {/* ✅ Modal only appears when “Edit” clicked */}
+              {openEditPostModel && (
+                <EditPostModal
+                  open={openEditPostModel}
+                  handleClose={() => setOpenEditPostModel(false)}
+                  data={data}
                 />
-                Delete Post
-              </MenuItem>
+              )}
 
               <MenuItem onClick={handleCopyLink}>
                 <LinkIcon fontSize="small" sx={{ mr: 1 }} />
-                Copy Link
+                {copied ? "Copied!" : "Copy Link"}
               </MenuItem>
+
               {/* <MenuItem onClick={handlePin}>📌 Pin / Unpin Post</MenuItem> */}
               {/* <Divider /> */}
 
@@ -554,7 +589,7 @@ export default function CardDesignHome({ data, loading }) {
             // overflow: "hidden",
           },
         }}
-        sx={{ zIndex: 20 }} 
+        sx={{ zIndex: 20 }}
       >
         <UserProfileCard data={data} className="user-profile-card" />
       </Popover>
@@ -597,7 +632,7 @@ export default function CardDesignHome({ data, loading }) {
       {/* Actions */}
       <CardContent
         orientation="horizontal"
-        sx={{ alignItems: "center", mx: -1 }}
+        sx={{ alignItems: "center", mx: -1, mb: 0 }}
       >
         <Box sx={{ display: "flex", gap: 0.5 }}>
           {loading ? (
@@ -615,9 +650,19 @@ export default function CardDesignHome({ data, loading }) {
                 onClick={likeHandler}
               >
                 {isLiked ? (
-                  <FavoriteIcon style={{ color: "green" }} />
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 2 }}
+                  >
+                    <FavoriteIcon style={{ color: "green" }} />
+                    <b>{formatCount(data?.like?.length || 0, "")}</b>
+                  </div>
                 ) : (
-                  <FavoriteBorder />
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 2 }}
+                  >
+                    <FavoriteBorder />
+                    <b>{formatCount(data?.like?.length || 0, "")}</b>
+                  </div>
                 )}
               </IconButton>
               <IconButton
@@ -626,7 +671,10 @@ export default function CardDesignHome({ data, loading }) {
                 size="sm"
                 onClick={() => setShowCommentBox((prev) => !prev)} // toggle
               >
-                <ModeCommentOutlined />
+                <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <ModeCommentOutlined />
+                  <b>{formatCount(data?.comment?.length || 0, "")}</b>
+                </div>
               </IconButton>
 
               <IconButton
@@ -635,7 +683,10 @@ export default function CardDesignHome({ data, loading }) {
                 size="sm"
                 onClick={handleOpenSocial}
               >
-                <SendOutlined />
+                <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <SendOutlined />
+                  <b>{formatCount(data?.share?.length || 0, "")}</b>
+                </div>
               </IconButton>
 
               <Menu
@@ -734,17 +785,6 @@ export default function CardDesignHome({ data, loading }) {
               sx={{ fontSize: "sm", fontWeight: "lg", cursor: "default" }}
               className="LCS-link"
             >
-              {/* <div className="LCS-count">
-                {formatCount(data?.like?.length || 0, "❤️")}
-              </div>
-
-              <div className="LCS-count">
-                {formatCount(data?.comment?.length || 0, "💬")}
-              </div>
-
-              <div className="LCS-count">
-                {formatCount(data?.share?.length || 0, "📤")}
-              </div> */}
               <div className="LCS-count">
                 <FavoriteBorderIcon
                   sx={{
@@ -780,7 +820,7 @@ export default function CardDesignHome({ data, loading }) {
             </Link>
 
             <Typography
-              sx={{ fontSize: "sm", textAlign: "justify" }}
+              sx={{ fontSize: "sm", textAlign: "justify", marginTop: 0 }}
               className="card-link-title"
             >
               {data?.blogTitle ||
@@ -809,7 +849,9 @@ export default function CardDesignHome({ data, loading }) {
         <CardContent sx={{ p: 0, m: 0 }}>
           <b
             onClick={() => {
-              navigate(`/blog-details/${blogData?.blogID}`);
+              navigate(`/blog-details/${blogData?.blogID}`, {
+                state: { edit: edit },
+              });
             }}
             className="read-more-text"
           >

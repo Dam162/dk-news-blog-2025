@@ -7,6 +7,8 @@ import CardDesignHome from "./card-design";
 import UserProfileCard from "./prof-card-hover";
 import BasicModal from "./basic-model";
 import CardDesignDetails from "./details-card-dsgn";
+import EditPostModal from "./edit-open-model";
+import CommentThread from "./comment-thread";
 export {
   Navbar,
   UserProfile,
@@ -17,4 +19,6 @@ export {
   UserProfileCard,
   BasicModal,
   CardDesignDetails,
+  EditPostModal,
+  CommentThread,
 };

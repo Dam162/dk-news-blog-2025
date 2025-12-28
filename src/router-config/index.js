@@ -11,8 +11,8 @@ import {
   ForgotPassword,
   PageNotFound,
   EmailVerify,
-  Favourites,
   BlogDetails,
+  Favorites,
 } from "../pages";
 
 function RouterConfig() {
@@ -29,7 +29,7 @@ function RouterConfig() {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/email-verify" element={<EmailVerify />} />
-          <Route path="/favourites" element={<Favourites />} />
+          <Route path="/favorites" element={<Favorites />} />
           <Route path="/blog-details/:id" element={<BlogDetails />} />
           <Route path="/page-not-found" element={<PageNotFound />} />
         </Routes>

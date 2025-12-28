@@ -79,6 +79,12 @@ const Navbar = () => {
       cName: "nav-links",
     },
     {
+      title: "Favorites",
+      url: "/favorites",
+      icon: "fa-solid fa-bookmark",
+      cName: "nav-links",
+    },
+    {
       title: "Create-Post",
       url: "/create-blog",
       icon: "fa-solid fa-calendar-plus",

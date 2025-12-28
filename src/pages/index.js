@@ -10,6 +10,7 @@ import EmailVerify from "./email-verify";
 import PageNotFound from "./page-not-found";
 import Favourites from "./favourites";
 import BlogDetails from "./blog-details";
+import Favorites from "./favourites";
 
 export {
   Home,
@@ -24,4 +25,5 @@ export {
   EmailVerify,
   Favourites,
   BlogDetails,
+  Favorites,
 };
