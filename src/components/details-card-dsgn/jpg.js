@@ -31,10 +31,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { toast } from "react-toastify";
 // MUI Menu Components
 import Menu from "@mui/material/Menu";
-import { MenuItem, Snackbar } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import LinkIcon from "@mui/icons-material/Link";
+import MenuItem from "@mui/material/MenuItem";
 
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
@@ -46,22 +43,31 @@ import {
   LinkedIn as LinkedinIcon,
   Telegram as TelegramIcon,
 } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LinkIcon from "@mui/icons-material/Link";
 import EditPostModal from "../edit-open-model";
+import CommentThread from "../comment-thread";
 
-export default function CardDesignHome({ data, loading, edit }) {
-  const location = useLocation();
-  console.log("location in card:", location);
-  const blogData = data;
+export default function CardDesignDetails({
+  data,
+  detailsPath,
+  loading,
+  edit,
+}) {
+  //   console.log("blogDetailsData", data);
+  const blogsData = data;
   const auth = getAuth();
   const db = getFirestore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [modelOpen, setModelOpen] = useState(false);
-  const [openEditPostModel, setOpenEditPostModel] = useState(false);
   const [currentUserUid, setCurrentUserUid] = useState(null);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [alreadyLogin, setAlreadyLogin] = useState(false);
+  const [openEditPostModel, setOpenEditPostModel] = useState(false);
   // const [isLiked, setIsLiked] = useState(false);
-  const isLiked = blogData?.like?.includes(currentUserUid);
+  const isLiked = data?.like?.includes(currentUserUid);
   // const isFavorite = currentUserData?.favorites?.includes(blogData?.blogID);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -77,9 +83,17 @@ export default function CardDesignHome({ data, loading, edit }) {
   // console.log("blogData in card", blogData);
   // console.log("currentUserData in card", currentUserData);
 
+  // ✅ Check if we are on Dashboard page
+  const isDashboard = location.pathname.includes("/dashboard");
+  console.log("isDashboard:", isDashboard);
+
+  // ✅ Check if logged-in user is author
+  const isAuthor = currentUserUid === data?.userID;
+  console.log("isAuthor:", isAuthor);
+
   // 🔹 state for profile popover
   const [profileAnchor, setProfileAnchor] = useState(null);
-  const [showCommentBox, setShowCommentBox] = useState(false);
+  const [showCommentBox, setShowCommentBox] = useState(true);
   const profileOpen = Boolean(profileAnchor);
 
   // comment box state
@@ -88,16 +102,7 @@ export default function CardDesignHome({ data, loading, edit }) {
 
   const [anchorE2, setAnchorE2] = useState(null);
   const open2 = Boolean(anchorE2);
-  const [copied, setCopied] = useState(false);
 
-  // ✅ Check if we are on Dashboard page
-  const isDashboard = location.pathname.includes("/dashboard");
-  console.log("isDashboard:", isDashboard);
-
-  // ✅ Check if logged-in user is author
-  const isAuthor = currentUserUid === blogData?.userID;
-  console.log("isAuthor:", isAuthor);
-  // const shareUrl = `https://dk-news-blog-2025.vercel.app/blog-details/${blogData?.blogID}`;
   const handleOpenSocial = (event) => {
     setAnchorE2(event.currentTarget);
   };
@@ -108,7 +113,7 @@ export default function CardDesignHome({ data, loading, edit }) {
 
   // shareHandler
   const handleShare = async (platform) => {
-    const shareUrl = `https://dk-news-blog-2025.vercel.app/blog-details/${blogData?.blogID}`;
+    const shareUrl = `https://dk-news-blog-2025.vercel.app/blog-details/${data?.blogID}`;
     let url = "";
 
     switch (platform) {
@@ -142,55 +147,6 @@ export default function CardDesignHome({ data, loading, edit }) {
     handleCloseSocial();
   };
 
-  // const handleShare = (platform) => {
-  //   let url = "";
-
-  //   switch (platform) {
-  //     case "facebook":
-  //       url = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
-  //       break;
-  //     case "twitter":
-  //       url = `https://twitter.com/intent/tweet?url=${shareUrl}`;
-  //       break;
-  //     case "linkedin":
-  //       url = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
-  //       break;
-  //     case "whatsapp":
-  //       url = `https://api.whatsapp.com/send?text=${shareUrl}`;
-  //       break;
-  //     case "telegram":
-  //       url = `https://t.me/share/url?url=${shareUrl}`;
-  //       break;
-  //     default:
-  //       break;
-  //   }
-
-  //   window.open(url, "_blank");
-  //   handleCloseSocial();
-  // };
-  //  const [anchorEl, setAnchorEl] = useState(null);
-  // const open = Boolean(anchorEl);
-  // useEffect(() => {
-  //   onAuthStateChanged(auth, async (user) => {
-  //     if (user) {
-  //       setIsLoggedIn(true);
-  //       const userRef = doc(db, "users-dk-news-blog", user.uid);
-  //       const userSnap = await getDoc(userRef);
-
-  //       if (userSnap.exists()) {
-  //         setUserData(userSnap.data());
-  //       } else {
-  //         setUserData({
-  //           displayName: user.displayName || "User",
-  //           email: user.email,
-  //         });
-  //       }
-  //     } else {
-  //       setIsLoggedIn(false);
-  //       setUserData(null);
-  //     }
-  //   });
-  // }, []);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -205,8 +161,8 @@ export default function CardDesignHome({ data, loading, edit }) {
           setCurrentUserData(userDataWithID);
 
           // 🔹 Set isFavorite based on current user's favorites
-          if (blogData?.blogID) {
-            setIsFavorite(userDataWithID.favorites?.includes(blogData.blogID));
+          if (data?.blogID) {
+            setIsFavorite(userDataWithID.favorites?.includes(data.blogID));
           }
         } else {
           setCurrentUserData(null);
@@ -222,7 +178,7 @@ export default function CardDesignHome({ data, loading, edit }) {
     });
 
     return () => unsubscribe();
-  }, [auth, db, blogData?.blogID]);
+  }, [auth, db, data?.blogID]);
 
   const formatCount = (count, emoji) => {
     if (!count) return `0 ${emoji}`;
@@ -235,7 +191,7 @@ export default function CardDesignHome({ data, loading, edit }) {
   const likeHandler = async () => {
     // setIsLiked(true);
     if (alreadyLogin) {
-      let like = blogData?.like || [];
+      let like = data?.like || [];
       let isLikedIn = like?.includes(currentUserUid);
       if (isLikedIn) {
         // remove
@@ -250,7 +206,7 @@ export default function CardDesignHome({ data, loading, edit }) {
         like.push(currentUserUid);
       }
       // update data
-      const blogRef = doc(db, "createPost-dk-news-blog", blogData?.blogID);
+      const blogRef = doc(db, "createPost-dk-news-blog", data?.blogID);
       await updateDoc(blogRef, { like: like });
     } else {
       setModelOpen(true);
@@ -264,14 +220,6 @@ export default function CardDesignHome({ data, loading, edit }) {
   const handleProfileClose = () => {
     setProfileAnchor(null);
   };
-
-  // console.log("isFavourites", isFavourite);
-  // useEffect(() => {
-  //   const favs = JSON.parse(localStorage.getItem("favourites")) || [];
-  //   if (data?.id && favs.includes(data.id)) {
-  //     // setIsFavourite(true);
-  //   }
-  // }, [data?.id]);
 
   const handleFavoriteClick = async () => {
     // alert("Feature coming soon!");
@@ -308,18 +256,18 @@ export default function CardDesignHome({ data, loading, edit }) {
     // alert("Feature coming soon!");
     if (alreadyLogin) {
       setLoadingComment(true);
-      let userComment = Array.isArray(blogData?.comment)
-        ? [...blogData.comment]
-        : [];
+      let userComment = Array.isArray(data?.comment) ? [...data.comment] : [];
       const newComment = {
         userID: currentUserUid,
         comment: comment,
         commentedAt: new Date().toISOString(),
         replyComments: [],
+        likes: [],
+        dislikes: [],
       };
       userComment.push(newComment);
       // update data
-      const blogRef = doc(db, "createPost-dk-news-blog", blogData?.blogID);
+      const blogRef = doc(db, "createPost-dk-news-blog", data?.blogID);
       await updateDoc(blogRef, { comment: userComment })
         .then(() => {
           toast.success("Comment Added Successfully", {
@@ -351,16 +299,12 @@ export default function CardDesignHome({ data, loading, edit }) {
     setAnchorEl(null);
   };
 
-  // Menu action handlers
-  const handleEdit = () => {
-    console.log("Edit Post");
-    handleMenuClose();
-  };
-
   const handleDelete = () => {
     console.log("Delete Post");
     handleMenuClose();
   };
+
+  const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
     try {
@@ -375,64 +319,11 @@ export default function CardDesignHome({ data, loading, edit }) {
     }
   };
 
-  // const handleShare = () => {
-  //   if (navigator.share) {
-  //     navigator.share({
-  //       title: data?.blogTitle,
-  //       text: data?.blogDetails,
-  //       url: window.location.href + "/post/" + data?.id,
-  //     });
-  //   } else {
-  //     console.log("Share API not supported");
-  //   }
-  //   handleMenuClose();
-  // };
-
-  // const handleReport = () => {
-  //   console.log("Report Post");
-  //   handleMenuClose();
-  // };
-
-  // const handleFollow = () => {
-  //   console.log("Follow / Unfollow Author");
-  //   handleMenuClose();
-  // };
-
-  // const handleSave = () => {
-  //   console.log("Save Post");
-  //   handleMenuClose();
-  // };
-
-  // const handlePin = () => {
-  //   console.log("Pin / Unpin Post");
-  //   handleMenuClose();
-  // };
-
-  // const handleInsights = () => {
-  //   console.log("View Insights");
-  //   handleMenuClose();
-  // };
-
-  // const handleMute = () => {
-  //   console.log("Mute Notifications");
-  //   handleMenuClose();
-  // };
-
   return (
     <Card
       variant="outlined"
       className="card-container"
       sx={{ position: "relative" }}
-
-      // onClick={() => {
-      //   navigate(`/blog-details/${blogData?.blogID}`, {
-      //     state: {
-      //       blogData: blogData,
-      //       loading: loading,
-      //       currentUserData: currentUserData,
-      //     },
-      //   });
-      // }}
     >
       {/* Header */}
       <CardContent
@@ -507,20 +398,8 @@ export default function CardDesignHome({ data, loading, edit }) {
                 vertical: "top",
                 horizontal: "right",
               }}
-              sx={{ zIndex: 1 }}
             >
-              {/* Post Management */}
-              {/* <MenuItem>👤 User Profile</MenuItem>
-              <MenuItem onClick={handleFollow}>
-                👤 Follow / Unfollow Author
-              </MenuItem> */}
-              {/* <MenuItem onClick={handleEdit}>✏️ Edit Post</MenuItem>
-              <MenuItem onClick={handleDelete}>🗑️ Delete Post</MenuItem>
-              <MenuItem onClick={handleCopyLink}>🔗 Copy Link</MenuItem> */}
-
-              {/* ✅ Show Edit/Delete only on dashboard and if current user is author */}
-              {/* ✅ Show Edit/Delete only if user is author AND route is dashboard */}
-              {isAuthor && isDashboard ? (
+              {isAuthor && (isDashboard || location?.state?.edit) ? (
                 <>
                   <MenuItem onClick={() => setOpenEditPostModel(true)}>
                     <EditIcon fontSize="small" sx={{ mr: 1 }} />
@@ -536,7 +415,7 @@ export default function CardDesignHome({ data, loading, edit }) {
                   </MenuItem>
                 </>
               ) : null}
-              {/* ✅ Modal only appears when “Edit” clicked */}
+
               {openEditPostModel && (
                 <EditPostModal
                   open={openEditPostModel}
@@ -549,23 +428,6 @@ export default function CardDesignHome({ data, loading, edit }) {
                 <LinkIcon fontSize="small" sx={{ mr: 1 }} />
                 {copied ? "Copied!" : "Copy Link"}
               </MenuItem>
-
-              {/* <MenuItem onClick={handlePin}>📌 Pin / Unpin Post</MenuItem> */}
-              {/* <Divider /> */}
-
-              {/* User Engagement */}
-              {/* <MenuItem onClick={handleShare}>📤 Share Post</MenuItem> */}
-              {/* <MenuItem onClick={handleSave}>📑 Save Post</MenuItem> */}
-              {/* <Divider /> */}
-
-              {/* Content Actions */}
-              {/* <MenuItem onClick={handleReport}>🚩 Report Post</MenuItem> */}
-              {/* <MenuItem onClick={handleMute}>🔕 Mute Notifications</MenuItem> */}
-
-              {/* <Divider /> */}
-
-              {/* Advanced */}
-              {/* <MenuItem onClick={handleInsights}>📊 View Insights</MenuItem> */}
             </Menu>
           </>
         )}
@@ -584,12 +446,8 @@ export default function CardDesignHome({ data, loading, edit }) {
           sx: {
             boxShadow: 3,
             borderRadius: 2,
-            // width: "200px",
-            // maxWidth: "90%",
-            // overflow: "hidden",
           },
         }}
-        sx={{ zIndex: 20 }}
       >
         <UserProfileCard data={data} className="user-profile-card" />
       </Popover>
@@ -632,7 +490,7 @@ export default function CardDesignHome({ data, loading, edit }) {
       {/* Actions */}
       <CardContent
         orientation="horizontal"
-        sx={{ alignItems: "center", mx: -1, mb: 0 }}
+        sx={{ alignItems: "center", mx: -1 }}
       >
         <Box sx={{ display: "flex", gap: 0.5 }}>
           {loading ? (
@@ -657,19 +515,14 @@ export default function CardDesignHome({ data, loading, edit }) {
                     <b>{formatCount(data?.like?.length || 0, "")}</b>
                   </div>
                 ) : (
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 2 }}
-                  >
-                    <FavoriteBorder />
-                    <b>{formatCount(data?.like?.length || 0, "")}</b>
-                  </div>
+                  <FavoriteBorder />
                 )}
               </IconButton>
               <IconButton
                 variant="plain"
                 color="neutral"
                 size="sm"
-                onClick={() => setShowCommentBox((prev) => !prev)} // toggle
+                onClick={() => setShowCommentBox((prev) => !prev)}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <ModeCommentOutlined />
@@ -688,7 +541,6 @@ export default function CardDesignHome({ data, loading, edit }) {
                   <b>{formatCount(data?.share?.length || 0, "")}</b>
                 </div>
               </IconButton>
-
               <Menu
                 anchorEl={anchorE2}
                 open={Boolean(anchorE2)}
@@ -725,6 +577,8 @@ export default function CardDesignHome({ data, loading, edit }) {
                   Telegram
                 </MenuItem>
               </Menu>
+
+
             </>
           )}
         </Box>
@@ -765,108 +619,18 @@ export default function CardDesignHome({ data, loading, edit }) {
             </IconButton>
           </Box>
         )}
+
+        
       </CardContent>
-
-      {/* Content */}
-      <CardContent sx={{ p: 0, m: 0 }}>
-        {loading ? (
-          <>
-            <Skeleton variant="text" width="95%" />
-            <Skeleton variant="text" width="95%" />
-            <Skeleton variant="text" width="95%" />
-            <Skeleton variant="text" width="95%" />
-          </>
-        ) : (
-          <>
-            {/* <Link
-              component="span"
-              underline="none"
-              textColor="text.primary"
-              sx={{ fontSize: "sm", fontWeight: "lg", cursor: "default" }}
-              className="LCS-link"
-            >
-              <div className="LCS-count">
-                <FavoriteBorderIcon
-                  sx={{
-                    fontSize: 16,
-                    verticalAlign: "middle",
-                    color: "#e91e63",
-                  }}
-                />
-                {formatCount(data?.like?.length || 0, "")}
-              </div>
-
-              <div className="LCS-count">
-                <ChatBubbleOutlineIcon
-                  sx={{
-                    fontSize: 16,
-                    verticalAlign: "middle",
-                    color: "#2196f3",
-                  }}
-                />
-                {formatCount(data?.comment?.length || 0, "")}
-              </div>
-
-              <div className="LCS-count">
-                <ShareOutlinedIcon
-                  sx={{
-                    fontSize: 16,
-                    verticalAlign: "middle",
-                    color: "#4caf50",
-                  }}
-                />
-                {formatCount(data?.share?.length || 0, "")}
-              </div>
-            </Link> */}
-
-            <Typography
-              sx={{
-                fontSize: "sm",
-                textAlign: "justify",
-                marginTop: 0,
-              }}
-              className="card-link-title"
-            >
-              {data?.blogTitle ||
-                "The React component library you always wanted The React component library you always wanted"}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "sm",
-                color: "text.tertiary",
-                textAlign: "justify",
-              }}
-              className="card-link-detail"
-            >
-              {data?.blogDetails ||
-                "MUI is a simple and powerful component library for React. Build your own design system, or start with Material Design."}
-            </Typography>
-          </>
-        )}
-      </CardContent>
-
-      {loading ? (
-        <>
-          <Skeleton variant="text" width="30%" />
-        </>
-      ) : (
-        <CardContent sx={{ p: 0, m: 0 }}>
-          <b
-            onClick={() => {
-              navigate(`/blog-details/${blogData?.blogID}`, {
-                state: { edit: edit },
-              });
-            }}
-            className="read-more-text"
-          >
-            Read more...
-          </b>
-        </CardContent>
-      )}
 
       {/* Comment Box */}
       {showCommentBox && (
-        <CardContent orientation="horizontal" sx={{ gap: 1, m: 0, p: 0 }}>
+        <CardContent
+          orientation="horizontal"
+          sx={{
+            gap: 1,
+          }}
+        >
           {loading ? (
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}
@@ -973,13 +737,31 @@ export default function CardDesignHome({ data, loading, edit }) {
                 {loadingComment ? (
                   <CircularProgress style={{ color: "white" }} size={20} />
                 ) : (
-                  "Post"
+                  "Comment"
                 )}
               </Link>
             </>
           )}
         </CardContent>
       )}
+      {/* Show all comments below */}
+      {Array.isArray(data?.comment) && data.comment.length > 0 && (
+        <CardContent
+          sx={{
+            // border: "1px solid lightgray",
+            // paddingX: 2,
+            borderRadius: 10,
+          }}
+        >
+          <CommentThread
+            currentUserData={currentUserData}
+            alreadyLogin={alreadyLogin}
+            data={blogsData}
+            postId={blogsData?.blogID}
+          />
+        </CardContent>
+      )}
+
       <BasicModal open={modelOpen} handleClose={() => setModelOpen(false)} />
     </Card>
   );

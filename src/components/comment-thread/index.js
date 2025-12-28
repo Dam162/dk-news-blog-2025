@@ -446,7 +446,13 @@ export default function CommentThread({ currentUserData, postId }) {
             </Typography>
 
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 2, mt: 0.8 }}
+              sx={{
+                display: "flex",
+                flexWrap: "wrap", // allows items to move to next line on small screens
+                alignItems: "center",
+                gap: 1, // use smaller gap for mobile
+                mt: 0.8,
+              }}
             >
               <Button
                 size="sm"
@@ -462,6 +468,7 @@ export default function CommentThread({ currentUserData, postId }) {
               >
                 {item.likes?.length || 0}
               </Button>
+
               <Button
                 size="sm"
                 variant="plain"
@@ -476,10 +483,11 @@ export default function CommentThread({ currentUserData, postId }) {
               >
                 {item.dislikes?.length || 0}
               </Button>
+
               <Button
                 size="sm"
                 variant="plain"
-                sx={{ fontSize: "xs" }}
+                sx={{ fontSize: { xs: "10px", sm: "12px" } }} // smaller font on mobile
                 onClick={() =>
                   setReplyState((prev) => ({
                     ...prev,

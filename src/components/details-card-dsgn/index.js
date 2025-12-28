@@ -97,7 +97,7 @@ export default function CardDesignDetails({
   const profileOpen = Boolean(profileAnchor);
 
   // comment box state
-  const [comment, setComment] = useState("");
+  const [comment, setComment] = useState([]);
   const [loadingComment, setLoadingComment] = useState(false);
 
   const [anchorE2, setAnchorE2] = useState(null);
@@ -221,6 +221,14 @@ export default function CardDesignDetails({
     setProfileAnchor(null);
   };
 
+  // console.log("isFavourites", isFavourite);
+  // useEffect(() => {
+  //   const favs = JSON.parse(localStorage.getItem("favourites")) || [];
+  //   if (data?.id && favs.includes(data.id)) {
+  //     // setIsFavourite(true);
+  //   }
+  // }, [data?.id]);
+
   const handleFavoriteClick = async () => {
     // alert("Feature coming soon!");
     if (alreadyLogin) {
@@ -299,6 +307,12 @@ export default function CardDesignDetails({
     setAnchorEl(null);
   };
 
+  // Menu action handlers
+  // const handleEdit = () => {
+  //   console.log("Edit Post");
+  //   handleMenuClose();
+  // };
+
   const handleDelete = () => {
     console.log("Delete Post");
     handleMenuClose();
@@ -318,6 +332,49 @@ export default function CardDesignDetails({
       console.error("Failed to copy link:", error);
     }
   };
+
+  // const handleShare = () => {
+  //   if (navigator.share) {
+  //     navigator.share({
+  //       title: data?.blogTitle,
+  //       text: data?.blogDetails,
+  //       url: window.location.href + "/post/" + data?.id,
+  //     });
+  //   } else {
+  //     console.log("Share API not supported");
+  //   }
+  //   handleMenuClose();
+  // };
+
+  // const handleReport = () => {
+  //   console.log("Report Post");
+  //   handleMenuClose();
+  // };
+
+  // const handleFollow = () => {
+  //   console.log("Follow / Unfollow Author");
+  //   handleMenuClose();
+  // };
+
+  // const handleSave = () => {
+  //   console.log("Save Post");
+  //   handleMenuClose();
+  // };
+
+  // const handlePin = () => {
+  //   console.log("Pin / Unpin Post");
+  //   handleMenuClose();
+  // };
+
+  // const handleInsights = () => {
+  //   console.log("View Insights");
+  //   handleMenuClose();
+  // };
+
+  // const handleMute = () => {
+  //   console.log("Mute Notifications");
+  //   handleMenuClose();
+  // };
 
   return (
     <Card
@@ -399,6 +456,16 @@ export default function CardDesignDetails({
                 horizontal: "right",
               }}
             >
+              {/* Post Management */}
+              {/* <MenuItem>👤 User Profile</MenuItem>
+              <MenuItem onClick={handleFollow}>
+                👤 Follow / Unfollow Author
+              </MenuItem> */}
+              {/* <MenuItem onClick={handleEdit}>✏️ Edit Post</MenuItem> */}
+              {/* <MenuItem onClick={handleDelete}>🗑️ Delete Post</MenuItem> */}
+              {/* <MenuItem onClick={handlePin}>📌 Pin / Unpin Post</MenuItem> */}
+              {/* <Divider /> */}
+
               {isAuthor && (isDashboard || location?.state?.edit) ? (
                 <>
                   <MenuItem onClick={() => setOpenEditPostModel(true)}>
@@ -428,6 +495,21 @@ export default function CardDesignDetails({
                 <LinkIcon fontSize="small" sx={{ mr: 1 }} />
                 {copied ? "Copied!" : "Copy Link"}
               </MenuItem>
+
+              {/* User Engagement */}
+              {/* <MenuItem onClick={handleCopyLink}>🔗 Copy Link</MenuItem> */}
+              {/* <MenuItem onClick={handleShare}>📤 Share Post</MenuItem> */}
+              {/* <MenuItem onClick={handleSave}>📑 Save Post</MenuItem> */}
+              {/* <Divider /> */}
+
+              {/* Content Actions */}
+              {/* <MenuItem onClick={handleReport}>🚩 Report Post</MenuItem> */}
+              {/* <MenuItem onClick={handleMute}>🔕 Mute Notifications</MenuItem> */}
+
+              {/* <Divider /> */}
+
+              {/* Advanced */}
+              {/* <MenuItem onClick={handleInsights}>📊 View Insights</MenuItem> */}
             </Menu>
           </>
         )}
@@ -446,6 +528,10 @@ export default function CardDesignDetails({
           sx: {
             boxShadow: 3,
             borderRadius: 2,
+            // width: "200px",
+            // maxWidth: "90%",
+            // overflow: "hidden",
+            // zIndex: 1300,
           },
         }}
       >
@@ -619,6 +705,91 @@ export default function CardDesignDetails({
         )}
       </CardContent>
 
+      {/* Content */}
+      <CardContent>
+        {loading ? (
+          <>
+            <Skeleton variant="text" width="30%" />
+            <Skeleton variant="text" width="90%" />
+            <Skeleton variant="text" width="80%" />
+            <Skeleton variant="text" width="95%" />
+          </>
+        ) : (
+          <>
+            {/* <Link
+              component="span"
+              underline="none"
+              textColor="text.primary"
+              sx={{ fontSize: "sm", fontWeight: "lg", cursor: "default" }}
+              className="LCS-link"
+            > */}
+              {/* <div className="LCS-count">
+                {formatCount(data?.like?.length || 0, "❤️")}
+              </div>
+
+              <div className="LCS-count">
+                {formatCount(data?.comment?.length || 0, "💬")}
+              </div>
+
+              <div className="LCS-count">
+                {formatCount(data?.share?.length || 0, "📤")}
+              </div> */}
+              {/* <div className="LCS-count">
+                <FavoriteBorderIcon
+                  sx={{
+                    fontSize: 16,
+                    verticalAlign: "middle",
+                    color: "#e91e63",
+                  }}
+                />
+                {formatCount(data?.like?.length || 0, "")}
+              </div>
+
+              <div className="LCS-count">
+                <ChatBubbleOutlineIcon
+                  sx={{
+                    fontSize: 16,
+                    verticalAlign: "middle",
+                    color: "#2196f3",
+                  }}
+                />
+                {formatCount(data?.comment?.length || 0, "")}
+              </div>
+
+              <div className="LCS-count">
+                <ShareOutlinedIcon
+                  sx={{
+                    fontSize: 16,
+                    verticalAlign: "middle",
+                    color: "#4caf50",
+                  }}
+                />
+                {formatCount(data?.share?.length || 0, "")}
+              </div> */}
+            {/* </Link> */}
+
+            <Typography
+              sx={{ fontSize: "sm", textAlign: "justify" }}
+              className="card-link-title-detail"
+            >
+              {data?.blogTitle ||
+                "The React component library you always wanted The React component library you always wanted"}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "sm",
+                color: "text.tertiary",
+                textAlign: "justify",
+              }}
+              className="card-link-detail-2"
+            >
+              {data?.blogDetails ||
+                "MUI is a simple and powerful component library for React. Build your own design system, or start with Material Design."}
+            </Typography>
+          </>
+        )}
+      </CardContent>
+
       {/* Comment Box */}
       {showCommentBox && (
         <CardContent
@@ -757,7 +928,6 @@ export default function CardDesignDetails({
           />
         </CardContent>
       )}
-
       <BasicModal open={modelOpen} handleClose={() => setModelOpen(false)} />
     </Card>
   );
