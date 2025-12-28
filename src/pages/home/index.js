@@ -65,9 +65,9 @@ const Home = () => {
   }, [db]);
 
   // console.log("blogData:", data);
-  const filteredData = data.filter((val) =>
-    val.blogTitle?.toLowerCase().includes(searchQuery)
-  );
+  const filteredData = data
+    .filter((val) => val.blogTitle?.toLowerCase().includes(searchQuery))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
     <div className="home-container">
@@ -120,9 +120,9 @@ const Home = () => {
           </Grid>
         </Box>
       </div>
-        <div className="FooterHome">
-          <Footer />
-        </div>
+      <div className="FooterHome">
+        <Footer />
+      </div>
     </div>
   );
 };
