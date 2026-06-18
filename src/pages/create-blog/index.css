@@ -28,8 +28,7 @@
 .FooterCreateBlog {
   margin-top: 13px;
   width: 100%;
-  padding: 10px 0;
   text-align: center;
-  background: #ffffff;
-  border-radius: 9px;
+  background-color: #a29f9f;
+  border-radius: 9px !important;
 }

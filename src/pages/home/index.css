@@ -32,10 +32,8 @@
   width: 100%;
 }
 .FooterHome {
-  margin-top: 0px;
   width: 90%;
-  padding: 10px 0;
   text-align: center;
-  background: #ffffff;
-  border-radius: 9px;
+  background-color: #a29f9f;
+  border-radius: 9px !important;
 }

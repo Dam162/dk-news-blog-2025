@@ -11,6 +11,7 @@ import PageNotFound from "./page-not-found";
 import Favourites from "./favourites";
 import BlogDetails from "./blog-details";
 import Favorites from "./favourites";
+import AdminDashboard from "./admin-dashboad";
 
 export {
   Home,
@@ -26,4 +27,5 @@ export {
   Favourites,
   BlogDetails,
   Favorites,
+  AdminDashboard,
 };

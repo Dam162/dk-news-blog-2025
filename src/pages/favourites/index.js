@@ -144,7 +144,7 @@ const Favorites = () => {
         </Box>
       </div>
 
-      <div className="FooterDashboard">
+      <div className="FooterFavorites">
         <Footer />
       </div>
     </div>

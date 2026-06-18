@@ -17,7 +17,7 @@
   transform: translateX(-50%); /* ✅ Fixed translate */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
-  z-index: 99 !important;
+  z-index: 1000 !important;
 }
 
 .NavbarItems.scrolled {
@@ -200,7 +200,7 @@
 }
 
 /* ---------------- RESPONSIVE ---------------- */
-@media screen and (max-width: 992px) {
+@media screen and (max-width: 1111px) {
   .search-container {
     max-width: 700px !important;
   }

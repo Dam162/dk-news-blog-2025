@@ -238,6 +238,7 @@ import { Avatar, Box, Button, Input, Typography } from "@mui/joy";
 import moment from "moment";
 import Popover from "@mui/material/Popover";
 import UserProfileCard from "../prof-card-hover";
+import BasicModal from "../basic-model";
 import {
   getFirestore,
   doc,
@@ -267,6 +268,8 @@ export default function CommentThread({ currentUserData, postId }) {
 
   const [profileAnchor, setProfileAnchor] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const [modelOpen, setModelOpen] = useState(false);
 
   const profileOpen = Boolean(profileAnchor);
 
@@ -441,7 +444,16 @@ export default function CommentThread({ currentUserData, postId }) {
             <Typography fontSize="xs" color="text.tertiary">
               {moment(item?.commentedAt).fromNow()}
             </Typography>
-            <Typography fontSize="sm" sx={{ mt: 0.5 }}>
+            <Typography
+              fontSize="sm"
+              sx={{
+                mt: 0.5,
+                wordBreak: "break-word", // long words break
+                overflowWrap: "break-word", // modern support
+                whiteSpace: "pre-wrap", // line breaks + wrapping
+                maxWidth: "100%", // prevent overflow
+              }}
+            >
               {item.comment}
             </Typography>
 
@@ -488,16 +500,27 @@ export default function CommentThread({ currentUserData, postId }) {
                 size="sm"
                 variant="plain"
                 sx={{ fontSize: { xs: "10px", sm: "12px" } }} // smaller font on mobile
-                onClick={() =>
+                onClick={() => {
+                  if (!currentUserUid) {
+                    {
+                      setModelOpen(true);
+                      return;
+                    }
+                  }
+
                   setReplyState((prev) => ({
                     ...prev,
                     [pathKey]: !prev[pathKey],
-                  }))
-                }
+                  }));
+                }}
               >
                 Reply
               </Button>
             </Box>
+            <BasicModal
+              open={modelOpen}
+              handleClose={() => setModelOpen(false)}
+            />
 
             {replyState[pathKey] && (
               <Box
@@ -517,7 +540,11 @@ export default function CommentThread({ currentUserData, postId }) {
                       [pathKey]: e.target.value,
                     }))
                   }
-                  sx={{ flex: 1 }}
+                  sx={{
+                    flex: 1,
+                    wordBreak: "break-word",
+                    overflowWrap: "break-word",
+                  }}
                 />
                 <Button
                   sx={{ borderRadius: 2 }}
@@ -530,7 +557,7 @@ export default function CommentThread({ currentUserData, postId }) {
             )}
 
             {(item.replyComments || []).map((rep, i) =>
-              renderComment(rep, [...path, "replyComments", i])
+              renderComment(rep, [...path, "replyComments", i]),
             )}
           </Box>
           {/* 👇 Popover for User Profile */}

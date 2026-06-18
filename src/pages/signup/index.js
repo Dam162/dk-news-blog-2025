@@ -64,6 +64,7 @@ const SignUp = () => {
               name: name,
               email: email,
               role: "USER",
+              joinedAt: new Date(),
               isVerifiedApplied: false,
             });
             toast.success("Success...!!!", {

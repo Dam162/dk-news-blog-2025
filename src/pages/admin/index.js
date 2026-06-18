@@ -1,22 +1,20 @@
 import React from "react";
 import "./index.css";
+import { Footer } from "../../components";
 import NavBar from "../../components/navbar";
+import AdminDashboard from "../admin-dashboad";
 
 const Admin = () => {
   return (
     <div className="admin-container">
-      <NavBar />
-
-      {/* Spacer for fixed navbar */}
-      <div className="nav-spacer"></div>
-
-      {/* Section below navbar */}
+      {/* <NavBar /> */}
+      {/* <div className="nav-spacer"></div> */}
       <div className="admin-section">
-        <h2>Admin Section</h2>
-        <p>
-          dsfadsf
-        </p>
+        <AdminDashboard />
       </div>
+      {/* <div className="footer-admin">
+        <Footer />
+      </div> */}
     </div>
   );
 };

@@ -36,10 +36,8 @@
 }
 
 .FooterProfile {
-  margin-top: 0px !important;
-  width: 100% !important;
-  padding: 10px 0;
+  width: 100%;
   text-align: center;
-  background: #ffffff;
-  border-radius: 9px;
+  background-color: #a29f9f;
+  border-radius: 9px !important;
 }
